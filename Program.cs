@@ -1,0 +1,16 @@
+using TiendaApi.Datos;
+using TiendaApi.Interfaces;
+using TiendaApi.modelo;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.AddScoped<IDproductos, Dproductos>();
+var app = builder.Build();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.Run();
