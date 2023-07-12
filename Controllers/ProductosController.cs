@@ -22,6 +22,7 @@ namespace TiendaApi.Controllers
             var lista = await _Dproductos.mostrarProductos();
             return lista;
 
+
         }
     }
 }
