@@ -59,5 +59,126 @@ namespace TiendaApi.Datos
                 }
             return lista;
         }
+        public async Task<long> insertarProductos(Mproductos PRODUCTOS)
+        {
+            long id = 0;
+            try
+            {
+                using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
+                {
+
+                    if (PRODUCTOS.descripcion != "" && PRODUCTOS.precio != 0)
+                    {
+                        id = await ExistProducto(PRODUCTOS.descripcion, PRODUCTOS.precio);
+                        if (id > 0)
+                        {
+                            return id;
+                        }
+                        else
+                        {
+                            await conn.OpenAsync();
+                            var cmd = new OracleCommand();
+                            cmd.Connection = conn;
+                            cmd.CommandText = @"
+                                        INSERT INTO DBTIENDA.PRODUCTOS
+                                        (id, descripion, precio)
+                                        VALUES(DBTIENDASEQUENCEPRODUCTOS.NEXTVAL, :P_descripcion, :P_precio)
+                                        ";
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "descricion", Value = PRODUCTOS.descripcion });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_CONSECUTIVO_EMPRESA", Value = PRODUCTOS.precio});
+                            /*cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_USUARIOCREACION", Value = ruta.USUARIO_CREACION });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_USUARIOMODIFICACION", Value = ruta.USUARIO_CREACION });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_ESTADO", Value = 'A' });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_CODIGOCONTRATISTA", Value = ruta.CODIGOCONTRATISTA });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_CODIGOTERRITORIAL", Value = ruta.CODIGOTERRITORIAL });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Date, Direction = ParameterDirection.Input, ParameterName = "P_FECHAINICIO", Value = ruta.FECHAINICIO });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Date, Direction = ParameterDirection.Input, ParameterName = "P_FECHAFIN", Value = ruta.FECHAFIN });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_ESAGRUPABLE", Value = ruta.ESAGRUPABLE });*/
+
+                            await cmd.ExecuteNonQueryAsync();
+
+                            cmd.CommandText = @"
+                                        select DBTIENDA.SEQUENCEPRODUCTOS.currval from dual
+                                        ";
+
+
+                            await cmd.ExecuteNonQueryAsync();
+
+                            var adapter = new OracleDataAdapter(cmd);
+                            var data = new DataSet("Datos");
+                            adapter.Fill(data);
+
+
+                            await conn.CloseAsync();
+
+                            if (data.Tables[0].Rows.Count > 0)
+                            {
+                                foreach (DataRow item in data.Tables[0].Rows)
+                                {
+                                    id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0;
+                                }
+                            }
+
+                            return id;
+                        }
+                    }
+                    else
+                    {
+                        return -2;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.Plugins.WriteExceptionLog(ex);
+                return -1;
+            }
+        }
+        private async Task<long> ExistProducto(string? descripcion, long? precio)
+        {
+            long id = 0;
+
+            try
+            {
+                using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
+                {
+                    await conn.OpenAsync();
+                    var cmd = new OracleCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT id, descripcion FROM DBTIENDA.PRODUCTOS WHERE descripcion = :P_descripion AND precio = :P_";
+
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_descripcion", Value = descripcion });
+                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_precio", Value = precio });
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    var adapter = new OracleDataAdapter(cmd);
+                    var data = new DataSet("Datos");
+                    adapter.Fill(data);
+
+                    await conn.CloseAsync();
+
+                    if (data.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow item in data.Tables[0].Rows)
+                        {
+                            id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0;
+                        }
+                    }
+
+                    return id;
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.Plugins.WriteExceptionLog(ex);
+            }
+
+                return id;
+            }
+        }
     }
-}
+}   
+
