@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Data.SqlClient;
-using TiendaApi.Conexion;
 using TiendaApi.Interfaces;
 using TiendaApi.modelo;
 namespace TiendaApi.Datos
@@ -17,14 +15,14 @@ namespace TiendaApi.Datos
         }
 
         public async Task<List<Mproductos>> mostrarProductos()
-        {
+          {
             var lista = new List<Mproductos>();
 
-            
+            using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
+            {
                 try
                 {
-                using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
-                {
+
                     await conn.OpenAsync();
                     var cmd = new OracleCommand();
                     cmd.Connection = conn;
@@ -51,14 +49,16 @@ namespace TiendaApi.Datos
                             });
                         }
                     }
+
                 }
-                }
+
                 catch (Exception ex)
                 {
-                 
+
                 }
-            return lista;
-        }
+                return lista;
+            }
+          }
         public async Task<long> insertarProductos(Mproductos PRODUCTOS)
         {
             long id = 0;
@@ -85,8 +85,8 @@ namespace TiendaApi.Datos
                                         VALUES(DBTIENDASEQUENCEPRODUCTOS.NEXTVAL, :P_descripcion, :P_precio)
                                         ";
                             cmd.Parameters.Clear();
-                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "descricion", Value = PRODUCTOS.descripcion });
-                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_CONSECUTIVO_EMPRESA", Value = PRODUCTOS.precio});
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_descricion", Value = PRODUCTOS.descripcion });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_precio", Value = PRODUCTOS.precio});
                             /*cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_USUARIOCREACION", Value = ruta.USUARIO_CREACION });
                             cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_USUARIOMODIFICACION", Value = ruta.USUARIO_CREACION });
                             cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_ESTADO", Value = 'A' });
@@ -119,8 +119,6 @@ namespace TiendaApi.Datos
                                     id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0;
                                 }
                             }
-
-                            return id;
                         }
                     }
                     else
@@ -131,10 +129,10 @@ namespace TiendaApi.Datos
             }
             catch (Exception ex)
             {
-                Util.Plugins.WriteExceptionLog(ex);
-                return -1;
+                Console.WriteLine("Ha ocurrido un error: " + ex.ToString());
             }
-        }
+            return id;
+        }     
         private async Task<long> ExistProducto(string? descripcion, long? precio)
         {
             long id = 0;
@@ -173,12 +171,10 @@ namespace TiendaApi.Datos
             }
             catch (Exception ex)
             {
-                Util.Plugins.WriteExceptionLog(ex);
+                Console.WriteLine("Ha ocurrido un error: " + ex.ToString());
             }
-
                 return id;
             }
-        }
     }
 }   
 
