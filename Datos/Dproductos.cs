@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using TiendaApi.Interfaces;
 using TiendaApi.modelo;
@@ -13,52 +12,6 @@ namespace TiendaApi.Datos
         {
             _ConnectionStrings = ConnectionStrings.Value;
         }
-
-        public async Task<List<Mproductos>> mostrarProductos()
-          {
-            var lista = new List<Mproductos>();
-
-            using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
-            {
-                try
-                {
-
-                    await conn.OpenAsync();
-                    var cmd = new OracleCommand();
-                    cmd.Connection = conn;
-                    cmd.CommandText = "SELECT ID, DESCRIPCION, PRECIO FROM DBTIENDA.PRODUCTOS";
-
-                    await cmd.ExecuteNonQueryAsync();
-
-                    var adapter = new OracleDataAdapter(cmd);
-                    var data = new DataSet("Datos");
-                    adapter.Fill(data);
-
-                    await conn.CloseAsync();
-
-                    if (data.Tables[0].Rows.Count > 0)
-                    {
-                        foreach (DataRow item in data.Tables[0].Rows)
-                        {
-                            lista.Add(new Mproductos
-                            {
-                                id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0,
-                                descripcion = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[1]) ? Convert.ToString(item.ItemArray[1]) : "SIN DESCRIPCION",
-                                precio = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[2]) ? Convert.ToInt64(item.ItemArray[2]) : 0,
-
-                            });
-                        }
-                    }
-
-                }
-
-                catch (Exception ex)
-                {
-
-                }
-                return lista;
-            }
-          }
         public async Task<long> insertarProductos(Mproductos PRODUCTOS)
         {
             long id = 0;
@@ -306,6 +259,67 @@ namespace TiendaApi.Datos
             }
                 return id;
             }
+
+        public Task<List<Mproductos>> MostrarProductos()
+        {
+            var lista = new List<Mproductos>();
+
+            using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
+            {
+                try
+                {
+
+                    await conn.OpenAsync();
+                    var cmd = new OracleCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT ID, DESCRIPCION, PRECIO FROM DBTIENDA.PRODUCTOS";
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    var adapter = new OracleDataAdapter(cmd);
+                    var data = new DataSet("Datos");
+                    adapter.Fill(data);
+
+                    await conn.CloseAsync();
+
+                    if (data.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow item in data.Tables[0].Rows)
+                        {
+                            lista.Add(new Mproductos
+                            {
+                                id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0,
+                                descripcion = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[1]) ? Convert.ToString(item.ItemArray[1]) : "SIN DESCRIPCION",
+                                precio = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[2]) ? Convert.ToInt64(item.ItemArray[2]) : 0,
+
+                            });
+                        }
+                    }
+
+                }
+
+                catch (Exception ex)
+                {
+
+                }
+                return lista;
+            }
+        }
+
+        public Task<List<Mproductos>> InsertarProductos(Mproductos producto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Mproductos>> EditarProductos(Mproductos producto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Mproductos>> EliminarProductos(long id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }   
 

@@ -19,14 +19,12 @@ namespace TiendaApi.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Mproductos>>> Get()
         {
-            var lista = await _Dproductos.mostrarProductos();
-            return lista;
+            return await _Dproductos.MostrarProductos();
         }
         [HttpPost]
-        public async Task Post([FromBody] Mproductos PRODUCTOS)
+        public async Task<ActionResult<List<Mproductos>>> Post([FromBody] Mproductos PRODUCTOS)
         {
-            var info = new Dproductos();
-            await info.insertarProductos(PRODUCTOS);
+           return  await _Dproductos.InsertarProductos(PRODUCTOS);
         }
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id,[FromBody] Mproductos PRODUCTOS)

@@ -4,7 +4,13 @@ namespace TiendaApi.Interfaces
 {
     public interface IDproductos
     {
-        Task<List<Mproductos>> mostrarProductos();
+        Task<List<Mproductos>> MostrarProductos();
+
+        Task<List<Mproductos>> InsertarProductos(Mproductos producto);
+
+        Task<List<Mproductos>> EditarProductos(Mproductos producto);
+
+        Task<List<Mproductos>> EliminarProductos(long id);
 
     }
 }
