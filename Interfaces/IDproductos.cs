@@ -6,11 +6,11 @@ namespace TiendaApi.Interfaces
     {
         Task<List<Mproductos>> MostrarProductos();
 
-        Task<List<Mproductos>> InsertarProductos(Mproductos producto);
+        Task<long> InsertarProductos(Mproductos PRODUCTOS);
 
-        Task<List<Mproductos>> EditarProductos(Mproductos producto);
+        Task<long> EditarProductos(Mproductos PRODUCTOS);
 
-        Task<List<Mproductos>> EliminarProductos(long id);
+        Task<long> EliminarProductos(Mproductos PRODUCTOS);
 
     }
 }
