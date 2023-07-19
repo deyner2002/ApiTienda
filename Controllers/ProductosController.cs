@@ -26,23 +26,21 @@ namespace TiendaApi.Controllers
         {
             return await _Dproductos.InsertarProductos(PRODUCTOS);
         }
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult> Put(int id,[FromBody] Mproductos PRODUCTOS)
-        //{
-        //    var info = new Dproductos();
-        //    PRODUCTOS.id = id;
-        //    await info.EditarProductos(PRODUCTOS);
-        //    return NoContent();
-        //}
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult> Delete(int id)
-        //{
-        //    var info = new Dproductos();
-        //    var PRODUCTOS=new Mproductos();
-        //    PRODUCTOS.id = id;
-        //    await info.EliminarProductos(PRODUCTOS);
-        //    return NoContent();
-        //}
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, [FromBody] Mproductos PRODUCTOS)
+        {
+            PRODUCTOS.id = id;
+            await _Dproductos.EditarProductos(PRODUCTOS);
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var PRODUCTOS = new Mproductos();
+            PRODUCTOS.id = id;
+            await _Dproductos.EliminarProductos(PRODUCTOS);
+            return NoContent();
+        }
     }
 
 

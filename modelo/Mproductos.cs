@@ -3,8 +3,8 @@
     public class Mproductos
     {
         public long? id { get; set; }
-        public string? descripcion { get; set; }
-        public long? precio { get; set;}
+        public string? DESCRIPCION { get; set; }
+        public long? PRECIO { get; set;}
 
     }
 }

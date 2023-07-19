@@ -12,7 +12,7 @@ namespace TiendaApi.Datos
         {
             _ConnectionStrings = ConnectionStrings.Value;
         }
-        private async Task<long> ExistProducto(string? descripcion, long? precio)
+        private async Task<long> ExistProducto(string? DESCRIPCION, long? PRECIO)
         {
             long id = 0;
 
@@ -23,11 +23,11 @@ namespace TiendaApi.Datos
                     await conn.OpenAsync();
                     var cmd = new OracleCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT id, descripcion FROM DBTIENDA.PRODUCTOS WHERE descripcion = :P_descripion AND precio = :P_precio";
+                    cmd.CommandText = "SELECT id, DESCRIPCION FROM DBTIENDA.PRODUCTOS WHERE DESCRIPCION = :P_DESCRIPCION AND PRECIO = :P_PRECIO";
 
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_descripcion", Value = descripcion });
-                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_precio", Value = precio });
+                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_DESCRIPCION", Value = DESCRIPCION });
+                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_PRECIO", Value = PRECIO });
 
                     await cmd.ExecuteNonQueryAsync();
 
@@ -83,8 +83,8 @@ namespace TiendaApi.Datos
                             lista.Add(new Mproductos
                             {
                                 id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0,
-                                descripcion = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[1]) ? Convert.ToString(item.ItemArray[1]) : "SIN DESCRIPCION",
-                                precio = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[2]) ? Convert.ToInt64(item.ItemArray[2]) : 0,
+                                DESCRIPCION = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[1]) ? Convert.ToString(item.ItemArray[1]) : "SIN DESCRIPCION",
+                                PRECIO = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[2]) ? Convert.ToInt64(item.ItemArray[2]) : 0,
 
                             });
                         }
@@ -107,9 +107,9 @@ namespace TiendaApi.Datos
                     using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
                     {
 
-                        if (PRODUCTOS.descripcion != "" && PRODUCTOS.precio != 0)
+                        if (PRODUCTOS.DESCRIPCION != "" && PRODUCTOS.PRECIO != 0)
                         {
-                            id = await ExistProducto(PRODUCTOS.descripcion, PRODUCTOS.precio);
+                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
                             if (id > 0)
                             {
                                 return id;
@@ -121,17 +121,17 @@ namespace TiendaApi.Datos
                                 cmd.Connection = conn;
                                 cmd.CommandText = @"
                                         INSERT INTO DBTIENDA.PRODUCTOS
-                                        (id, descripion, precio)
-                                        VALUES(DBTIENDA.SEQUENCEPRODUCTOS.NEXTVAL, :P_descripcion, :P_precio)
+                                        (id, DESCRIPCION, PRECIO)
+                                        VALUES(DBTIENDA.SECUENCIAPRODUCTOS.NEXTVAL, :P_DESCRIPCION, :P_PRECIO)
                                         ";
                                 cmd.Parameters.Clear();
-                                cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_descripcion", Value = PRODUCTOS.descripcion });
-                                cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_precio", Value = PRODUCTOS.precio });
+                                cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_DESCRIPCION", Value = PRODUCTOS.DESCRIPCION });
+                                cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_PRECIO", Value = PRODUCTOS.PRECIO });
                                
                                 await cmd.ExecuteNonQueryAsync();
 
                                 cmd.CommandText = @"
-                                        select DBTIENDA.SEQUENCEPRODUCTOS.currval from dual
+                                        select DBTIENDA.SECUENCIAPRODUCTOS.currval from dual
                                         ";
 
 
@@ -173,9 +173,9 @@ namespace TiendaApi.Datos
                 using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
                 {
 
-                    if (PRODUCTOS.descripcion != "" && PRODUCTOS.precio != 0)
+                    if (PRODUCTOS.DESCRIPCION != "" && PRODUCTOS.PRECIO != 0)
                     {
-                        id = await ExistProducto(PRODUCTOS.descripcion, PRODUCTOS.precio);
+                        id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
                         if (id > 0)
                         {
                             return id;
@@ -186,18 +186,18 @@ namespace TiendaApi.Datos
                             var cmd = new OracleCommand();
                             cmd.Connection = conn;
                             cmd.CommandText = @"
-                                        INSERT INTO DBTIENDA.PRODUCTOS
+                                        UPDATE INTO DBTIENDA.PRODUCTOS
                                         (id, descripion, precio)
-                                        VALUES(DBTIENDASEQUENCEPRODUCTOS.NEXTVAL, :P_descripcion, :P_precio)
+                                        VALUES(DBTIENDA.SECUENCIAPRODUCTOS.NEXTVAL, :P_DESCRIPCION, :P_PRECIO)
                                         ";
                             cmd.Parameters.Clear();
                             cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_id", Value = PRODUCTOS.id });
-                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_precio", Value = PRODUCTOS.precio });
+                            cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_PRECIO", Value = PRODUCTOS.PRECIO });
 
                             await cmd.ExecuteNonQueryAsync();
 
                             cmd.CommandText = @"
-                                        select DBTIENDA.SEQUENCEPRODUCTOS.currval from dual
+                                        select DBTIENDA.SECUENCIAPRODUCTOS.currval from dual
                                         ";
 
 
@@ -239,9 +239,9 @@ namespace TiendaApi.Datos
                     using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
                     {
 
-                        if (PRODUCTOS.descripcion != "" && PRODUCTOS.precio != 0)
+                        if (PRODUCTOS.DESCRIPCION != "" && PRODUCTOS.PRECIO != 0)
                         {
-                            id = await ExistProducto(PRODUCTOS.descripcion, PRODUCTOS.precio);
+                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
                             if (id > 0)
                             {
                                 return id;
@@ -254,7 +254,7 @@ namespace TiendaApi.Datos
                                 cmd.CommandText = @"
                                         INSERT INTO DBTIENDA.PRODUCTOS
                                         (id, descripion, precio)
-                                        VALUES(DBTIENDASEQUENCEPRODUCTOS.NEXTVAL, :P_descripcion, :P_precio)
+                                        VALUES(DBTIENDA.SECUENCIAPRODUCTOS.NEXTVAL, :P_DESCRIPCION, :P_PRECIO)
                                         ";
                                 cmd.Parameters.Clear();
                                 cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_id", Value = PRODUCTOS.id });
@@ -262,7 +262,7 @@ namespace TiendaApi.Datos
                                 await cmd.ExecuteNonQueryAsync();
 
                                 cmd.CommandText = @"
-                                        select DBTIENDA.SEQUENCEPRODUCTOS.currval from dual
+                                        select DBTIENDA.SECUENCIAPRODUCTOS.currval from dual
                                         ";
 
 
