@@ -27,10 +27,9 @@ namespace TiendaApi.Controllers
             return await _Dproductos.InsertarProductos(PRODUCTOS);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Mproductos PRODUCTOS)
+        public async Task<ActionResult> Put(int id, long PRECIO)
         {
-            PRODUCTOS.id = id;
-            await _Dproductos.EditarProductos(PRODUCTOS);
+            await _Dproductos.EditarProductos(id, PRECIO);
             return NoContent();
         }
         [HttpDelete("{id}")]

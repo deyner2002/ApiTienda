@@ -8,7 +8,7 @@ namespace TiendaApi.Interfaces
 
         Task<long> InsertarProductos(Mproductos PRODUCTOS);
 
-        Task<long> EditarProductos(Mproductos PRODUCTOS);
+        Task<long> EditarProductos(int id, long PRECIO);
 
         Task<long> EliminarProductos(Mproductos PRODUCTOS);
 
