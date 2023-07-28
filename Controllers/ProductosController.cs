@@ -153,6 +153,4 @@ namespace TiendaApi.Controllers
             return response;
         }
     }
-
-
 }
