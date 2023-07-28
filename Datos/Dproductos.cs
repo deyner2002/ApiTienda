@@ -95,7 +95,7 @@ namespace TiendaApi.Datos
 
                 catch (Exception ex)
                 {
-
+                    Console.WriteLine("Ha ocurrido un error inesperado: " + ex.ToString());
                 }
                 return lista;
             }
@@ -160,9 +160,9 @@ namespace TiendaApi.Datos
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine("Ha ocurrido un error: " + ex.ToString());
+                    return -1;
                 }
                 return id;
             }
@@ -178,11 +178,6 @@ namespace TiendaApi.Datos
                         await conn.OpenAsync();
                         var cmd = new OracleCommand();
                         cmd.Connection = conn;
-                        //cmd.CommandText = @"
-                        //                UPDATE DBTIENDA.PRODUCTOS
-                        //                set PRECIO = :P_PRECIO
-                        //                where id = :P_id
-                        //                ";
                         cmd.CommandText = string.Format(@"
                                         UPDATE DBTIENDA.PRODUCTOS
                                         set PRECIO = {1}
@@ -197,9 +192,8 @@ namespace TiendaApi.Datos
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Ha ocurrido un error: " + ex.ToString());
                 return -1;
             }
             return id;
@@ -207,12 +201,12 @@ namespace TiendaApi.Datos
         public async Task<long> EliminarProductos(Mproductos PRODUCTOS)
         {
             long id = 0;
-                try
+            try
+            {
+                using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
                 {
-                    using (var conn = new OracleConnection(_ConnectionStrings.WebConnection))
-                    {
 
-                        if (PRODUCTOS.DESCRIPCION != "" && PRODUCTOS.PRECIO != 0)
+                    if (PRODUCTOS.id > 0)
                         {
                             id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
                             if (id > 0)
@@ -240,9 +234,9 @@ namespace TiendaApi.Datos
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine("Ha ocurrido un error: " + ex.ToString());
+                return -1;
                 }
                 return id;
             }
