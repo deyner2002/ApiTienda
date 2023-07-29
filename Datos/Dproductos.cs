@@ -13,7 +13,7 @@ namespace TiendaApi.Datos
         {
             _ConnectionStrings = ConnectionStrings.Value;
         }
-        private async Task<long> ExistProducto(string? DESCRIPCION, long? PRECIO)
+        private async Task<long> ExistProducto(string? DESCRIPCION, long? PRECIO, long? CONSECUTIVOTIENDA)
         {
             long id = 0;
 
@@ -24,11 +24,12 @@ namespace TiendaApi.Datos
                     await conn.OpenAsync();
                     var cmd = new OracleCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT id, DESCRIPCION FROM DBTIENDA.PRODUCTOS WHERE DESCRIPCION = :P_DESCRIPCION AND PRECIO = :P_PRECIO";
+                    cmd.CommandText = "SELECT id, DESCRIPCION, CONSECUTIVOTIENDA FROM DBTIENDA.PRODUCTOS WHERE DESCRIPCION = :P_DESCRIPCION AND PRECIO = :P_PRECIO AND CONSECUTIVOTIENDA = :P_CONSECUTIVOTIENDA";
 
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_DESCRIPCION", Value = DESCRIPCION });
                     cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_PRECIO", Value = PRECIO });
+                    cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_CONSECUTIVOTIENDA", Value = CONSECUTIVOTIENDA });
 
                     await cmd.ExecuteNonQueryAsync();
 
@@ -67,7 +68,7 @@ namespace TiendaApi.Datos
                     await conn.OpenAsync();
                     var cmd = new OracleCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT ID, DESCRIPCION, PRECIO FROM DBTIENDA.PRODUCTOS";
+                    cmd.CommandText = "SELECT ID, DESCRIPCION, PRECIO,CONSECUTIVOTIENDA FROM DBTIENDA.PRODUCTOS";
 
                     await cmd.ExecuteNonQueryAsync();
 
@@ -86,6 +87,7 @@ namespace TiendaApi.Datos
                                 id = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[0]) ? Convert.ToInt64(item.ItemArray[0]) : 0,
                                 DESCRIPCION = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[1]) ? Convert.ToString(item.ItemArray[1]) : "SIN DESCRIPCION",
                                 PRECIO = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[2]) ? Convert.ToInt64(item.ItemArray[2]) : 0,
+                                CONSECUTIVOTIENDA = !Object.ReferenceEquals(System.DBNull.Value, item.ItemArray[3]) ? Convert.ToInt64(item.ItemArray[3]) : 0,
 
                             });
                         }
@@ -110,7 +112,7 @@ namespace TiendaApi.Datos
 
                         if (PRODUCTOS.DESCRIPCION != "" && PRODUCTOS.PRECIO != 0)
                         {
-                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
+                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO, PRODUCTOS.CONSECUTIVOTIENDA);
                             if (id > 0)
                             {
                                 return id;
@@ -122,14 +124,15 @@ namespace TiendaApi.Datos
                                 cmd.Connection = conn;
                                 cmd.CommandText = @"
                                         INSERT INTO DBTIENDA.PRODUCTOS
-                                        (id, DESCRIPCION, PRECIO)
-                                        VALUES(DBTIENDA.SECUENCIAPRODUCTOS.NEXTVAL, :P_DESCRIPCION, :P_PRECIO)
+                                        (id, DESCRIPCION, PRECIO, CONSECUTIVOTIENDA)
+                                        VALUES(DBTIENDA.SECUENCIAPRODUCTOS.NEXTVAL, :P_DESCRIPCION, :P_PRECIO, :P_CONSECUTIVOTIENDA)
                                         ";
                                 cmd.Parameters.Clear();
                                 cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Varchar2, Direction = ParameterDirection.Input, ParameterName = "P_DESCRIPCION", Value = PRODUCTOS.DESCRIPCION });
                                 cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_PRECIO", Value = PRODUCTOS.PRECIO });
-                               
-                                await cmd.ExecuteNonQueryAsync();
+                                cmd.Parameters.Add(new OracleParameter { OracleDbType = OracleDbType.Long, Direction = ParameterDirection.Input, ParameterName = "P_CONSECUTIVOTIENDA", Value = PRODUCTOS.CONSECUTIVOTIENDA });
+
+                            await cmd.ExecuteNonQueryAsync();
 
                                 cmd.CommandText = @"
                                         select DBTIENDA.SECUENCIAPRODUCTOS.currval from dual
@@ -166,7 +169,7 @@ namespace TiendaApi.Datos
                 }
                 return id;
             }
-        public async Task<long> EditarProductos(int id, long PRECIO)
+        public async Task<long> EditarProductos(int id, long PRECIO, int CONSECUTIVOTIENDA)
         {
             try
             {
@@ -180,9 +183,10 @@ namespace TiendaApi.Datos
                         cmd.Connection = conn;
                         cmd.CommandText = string.Format(@"
                                         UPDATE DBTIENDA.PRODUCTOS
+                                        set CONSECUTIVOTIENDA = {2}
                                         set PRECIO = {1}
                                         where id = {0}
-                                        ", id, PRECIO);  
+                                        ", id, PRECIO, CONSECUTIVOTIENDA);  
 
                        int row =  await cmd.ExecuteNonQueryAsync();
                     }
@@ -208,7 +212,7 @@ namespace TiendaApi.Datos
 
                     if (PRODUCTOS.id > 0)
                         {
-                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO);
+                            id = await ExistProducto(PRODUCTOS.DESCRIPCION, PRODUCTOS.PRECIO, PRODUCTOS.CONSECUTIVOTIENDA);
                             if (id > 0)
                             {
                                 return id;

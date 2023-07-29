@@ -10,7 +10,6 @@ namespace TiendaApi.Controllers
     public class ProductosController : ControllerBase
     {
         public readonly IDproductos _Dproductos;
-
         public ProductosController(IDproductos dproductos)
         {
             _Dproductos = dproductos;
@@ -80,13 +79,13 @@ namespace TiendaApi.Controllers
             return response;
         }
         [HttpPut("{id}")]
-        public async Task<Mrespuesta> Put(int id, long PRECIO)
+        public async Task<Mrespuesta> Put(int id, long PRECIO, int CONSECUTIVOTIENDA)
         {
             Mrespuesta response = new Mrespuesta();
 
             try
             {
-                long codigoRespuesta = _Dproductos.EditarProductos(id, PRECIO).Result;
+                long codigoRespuesta = _Dproductos.EditarProductos(id, PRECIO, CONSECUTIVOTIENDA).Result;
                 response.Datos = codigoRespuesta;
                 if (codigoRespuesta == -2)
                 {
